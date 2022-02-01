@@ -2,12 +2,13 @@ package config
 
 import (
 	"errors"
-	"gopkg.in/yaml.v2"
 	"log"
 	"os"
 	"path"
 	"sync"
 	"yagc/util"
+
+	"gopkg.in/yaml.v2"
 )
 
 type RepoCore struct {
@@ -35,10 +36,10 @@ var repoConf = &RepoConfig{}
 
 var repo sync.Once
 
-func Repo() (*RepoConfig, bool) {
+func Repo() *RepoConfig {
 	_, ok := util.GetRepoRoot()
 	if !ok {
-		return nil, false
+		return nil
 	}
 
 	repo.Do(func() {
@@ -48,7 +49,7 @@ func Repo() (*RepoConfig, bool) {
 			log.Fatalf("%s", err.Error())
 		}
 	})
-	return repoConf, true
+	return repoConf
 }
 
 func (config *RepoConfig) Load() error {

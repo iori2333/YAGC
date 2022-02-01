@@ -12,10 +12,6 @@ var rootCmd = &cobra.Command{
 	Long:  "YAGC is a git cli that is built on top of go.",
 }
 
-var subcommands = []*cobra.Command{
-	getInitCmd(),
-}
-
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -24,6 +20,10 @@ func Execute() {
 }
 
 func init() {
+	subcommands := []*cobra.Command{
+		getInitCmd(),
+	}
+
 	for _, subcommand := range subcommands {
 		rootCmd.AddCommand(subcommand)
 	}

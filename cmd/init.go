@@ -69,7 +69,7 @@ func handleInit(cmd *cobra.Command, args []string) {
 }
 
 func getInitCmd() *cobra.Command {
-	var initCmd = &cobra.Command{
+	initCmd := &cobra.Command{
 		Use:   "init",
 		Short: "Initialize a new yagc project",
 		Long:  "This command will initialize a new yagc project.",
