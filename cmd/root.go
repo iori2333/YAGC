@@ -22,6 +22,7 @@ func Execute() {
 func init() {
 	subcommands := []*cobra.Command{
 		getInitCmd(),
+		getHashObjectCmd(),
 	}
 
 	for _, subcommand := range subcommands {
