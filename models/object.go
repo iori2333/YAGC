@@ -1,6 +1,6 @@
 package models
 
-type FileType string
+type FileType = string
 
 const (
 	Blob   FileType = "blob"

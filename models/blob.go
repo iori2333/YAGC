@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"yagc/util"
@@ -21,9 +20,7 @@ func (blob *BlobObject) GetContent() []byte {
 	if err != nil {
 		log.Fatalf("Failed to read file %s: %s\n", blob.File, err)
 	}
-	header := fmt.Sprintf("%s %d\u0000", blob.GetType(), len(content))
-	content = append([]byte(header), content...)
-	return content
+	return util.EncodeObject(blob.GetType(), content)
 }
 
 func (blob *BlobObject) GetSha1() (string, []byte) {
