@@ -1,12 +1,15 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"log"
 	"os"
 	"path"
 	"sync"
+
+	"gopkg.in/yaml.v2"
 )
+
+const Version = "0.0.1"
 
 type UserConfig struct {
 	Name  string `yaml:"name"`

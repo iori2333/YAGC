@@ -11,7 +11,7 @@ import (
 
 func handleHashObject(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		log.Fatalln("missing argument: filename")
+		log.Fatalln("missing argument: file")
 	}
 
 	t := cmd.Flag("type").Value.String()
@@ -35,9 +35,9 @@ func handleHashObject(cmd *cobra.Command, args []string) {
 
 func getHashObjectCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "hash-object",
+		Use:   "hash-object file",
 		Short: "Compute object ID and optionally creates a blob from a file",
-		Long:  `Compute object ID and optionally creates a blob from a file. The object ID is printed to standard output.`,
+		Long:  `Computes the object ID value for an object with specified type with the contents of the named file (which can be outside of the work tree), and optionally writes the resulting object into the object database. Reports its object ID to its standard output. When <type> is not specified, it defaults to "blob".`,
 		Run:   handleHashObject,
 	}
 
