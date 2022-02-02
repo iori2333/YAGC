@@ -2,10 +2,8 @@ package config
 
 import (
 	"errors"
-	"log"
 	"os"
 	"path"
-	"sync"
 	"yagc/util"
 
 	"gopkg.in/yaml.v2"
@@ -34,28 +32,19 @@ type RepoConfig struct {
 
 var repoConf = &RepoConfig{}
 
-var repo sync.Once
+func init() {
+	repoConf = &RepoConfig{}
+	_ = repoConf.Load()
+}
 
 func Repo() *RepoConfig {
-	_, ok := util.GetRepoRoot()
-	if !ok {
-		return nil
-	}
-
-	repo.Do(func() {
-		repoConf = &RepoConfig{}
-
-		if err := repoConf.Load(); err != nil {
-			log.Fatalf("%s", err.Error())
-		}
-	})
 	return repoConf
 }
 
 func (config *RepoConfig) Load() error {
 	root, ok := util.GetRepoRoot()
 	if !ok {
-		return errors.New("repo root not found")
+		return nil
 	}
 	configFile := path.Join(root, ".yagc", "config")
 

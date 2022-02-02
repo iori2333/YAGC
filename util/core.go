@@ -5,24 +5,34 @@ import (
 	"compress/zlib"
 	"crypto/sha1"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 )
 
-func GetRepoRoot() (string, bool) {
-	workDir, _ := os.Getwd()
+var workDir string
+
+func init() {
+	workDir, _ = os.Getwd()
 	workDir, _ = filepath.Abs(workDir)
 
 	for workDir != "/" && workDir != "." {
-		if f, err := os.Stat(path.Join(workDir, ".yagc")); err == nil && f.IsDir() {
-			return workDir, true
-		} else {
-			workDir = path.Dir(workDir)
+		f, err := os.Stat(path.Join(workDir, ".yagc"))
+		if err == nil && f.IsDir() {
+			return
 		}
+		workDir = path.Dir(workDir)
 	}
-	return "", false
+
+	if workDir == "/" || workDir == "." {
+		workDir = ""
+	}
+}
+
+func GetRepoRoot() (string, bool) {
+	return workDir, workDir != ""
 }
 
 func Compress(content []byte) []byte {
@@ -33,7 +43,10 @@ func Compress(content []byte) []byte {
 		log.Fatalf("Failed to write to zlib writer: %s\n", err)
 	}
 
-	writer.Close()
+	err := writer.Close()
+	if err != nil {
+		log.Fatalf("Failed to close zlib writer: %s\n", err)
+	}
 	return buf.Bytes()
 }
 
@@ -42,7 +55,12 @@ func Decompress(content []byte) []byte {
 	if err != nil {
 		log.Fatalf("Failed to create zlib reader: %s\n", err)
 	}
-	defer reader.Close()
+	defer func(reader io.ReadCloser) {
+		err := reader.Close()
+		if err != nil {
+			log.Fatalf("Failed to close zlib reader: %s\n", err)
+		}
+	}(reader)
 
 	buf := bytes.Buffer{}
 	if _, err := buf.ReadFrom(reader); err != nil {

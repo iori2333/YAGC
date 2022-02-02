@@ -1,12 +1,9 @@
 package config
 
 import (
-	"log"
+	"gopkg.in/yaml.v2"
 	"os"
 	"path"
-	"sync"
-
-	"gopkg.in/yaml.v2"
 )
 
 const Version = "0.0.1"
@@ -22,14 +19,11 @@ type AppConfig struct {
 
 var conf = &AppConfig{}
 
-var app sync.Once
+func init() {
+	_ = conf.Load()
+}
 
 func App() *AppConfig {
-	app.Do(func() {
-		if err := conf.Load(); err != nil {
-			log.Printf("error loading config: %s\n", err.Error())
-		}
-	})
 	return conf
 }
 
