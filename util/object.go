@@ -2,19 +2,28 @@ package util
 
 import (
 	"bytes"
-	"compress/zlib"
-	"crypto/sha1"
+	"errors"
 	"fmt"
+	"strconv"
 )
 
-func Compress(content []byte) []byte {
-	buf := bytes.Buffer{}
-	writer := zlib.NewWriter(&buf)
-	writer.Write(content)
-	writer.Close()
-	return buf.Bytes()
+func EncodeObject(objType string, content []byte) []byte {
+	header := fmt.Sprintf("%s %d ", objType, len(content))
+	content = append([]byte(header), content...)
+	return content
 }
 
-func GetSha1(content []byte) string {
-	return fmt.Sprintf("%x", sha1.Sum(content))
+func DecodeObject(content []byte) (string, int, []byte, error) {
+	header := bytes.SplitN(content, []byte(" "), 3)
+	if len(header) != 3 {
+		return "", 0, nil, errors.New("failed to parse object header")
+	}
+
+	size, err := strconv.ParseInt(string(header[1]), 10, 0)
+	if err != nil {
+		return "", 0, nil, errors.New("failed to parse object size")
+	}
+
+	objType, content := string(header[0]), header[2]
+	return objType, int(size), content, nil
 }
