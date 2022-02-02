@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"yagc/util"
 )
 
@@ -41,14 +42,34 @@ func Index() {
 }
 
 func Find(id string) []byte {
+	if len(id) <= 2 {
+		log.Fatalf("Invalid object name %s\n", id)
+	}
+
 	prefix, suffix := id[:2], id[2:]
 	root, ok := util.GetRepoRoot()
 	if !ok {
 		log.Fatalln("Failed to get repo root")
 	}
 
-	objectPath := path.Join(root, ".yagc", "objects", prefix, suffix)
-	content, err := os.ReadFile(objectPath)
+	objectPath := path.Join(root, ".yagc", "objects", prefix)
+	entires, _ := os.ReadDir(objectPath)
+
+	var objectFilePath string
+	for _, file := range entires {
+		if strings.HasPrefix(file.Name(), suffix) {
+			if objectFilePath != "" {
+				log.Fatalf("Multiple objects with name %s\n", id)
+			}
+			objectFilePath = path.Join(objectPath, file.Name())
+		}
+	}
+
+	if objectFilePath == "" {
+		log.Fatalf("Failed to find object %s\n", id)
+	}
+
+	content, err := os.ReadFile(objectFilePath)
 	if err != nil {
 		log.Fatalln("Failed to read object", id)
 	}
