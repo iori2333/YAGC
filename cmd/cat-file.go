@@ -33,7 +33,7 @@ func handleCatFile(cmd *cobra.Command, args []string) {
 		object = args[1]
 	}
 
-	content := db.Find(object)
+	content := db.FindObject(object)
 	realType, size, content, err := util.DecodeObject(content)
 
 	if useError {

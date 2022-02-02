@@ -1,15 +1,15 @@
 package models
 
-type FileType = string
+type ObjectType = string
 
 const (
-	Blob   FileType = "blob"
-	Commit FileType = "commit"
-	Tree   FileType = "tree"
+	Blob   ObjectType = "blob"
+	Commit ObjectType = "commit"
+	Tree   ObjectType = "tree"
 )
 
 type Object interface {
-	GetType() FileType
+	GetType() ObjectType
 	GetContent() []byte
-	GetSha1() string
+	GetSha1() (string, []byte)
 }

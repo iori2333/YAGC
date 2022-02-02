@@ -11,7 +11,7 @@ type BlobObject struct {
 	File string `yaml:"file"`
 }
 
-func (blob *BlobObject) GetType() FileType {
+func (blob *BlobObject) GetType() ObjectType {
 	return Blob
 }
 

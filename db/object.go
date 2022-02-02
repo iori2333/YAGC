@@ -8,7 +8,7 @@ import (
 	"yagc/util"
 )
 
-func Write(id string, content []byte) {
+func WriteObject(id string, content []byte) {
 	prefix, suffix := id[:2], id[2:]
 	root, ok := util.GetRepoRoot()
 
@@ -37,11 +37,7 @@ func Write(id string, content []byte) {
 	}
 }
 
-func Index() {
-	log.Fatalln("Not implemented")
-}
-
-func Find(id string) []byte {
+func FindObject(id string) []byte {
 	if len(id) <= 2 {
 		log.Fatalf("Invalid object name %s\n", id)
 	}
@@ -73,7 +69,6 @@ func Find(id string) []byte {
 	if err != nil {
 		log.Fatalln("Failed to read object", id)
 	}
-	content = util.Decompress(content)
 
-	return content
+	return util.Decompress(content)
 }
