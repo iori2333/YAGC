@@ -35,6 +35,7 @@ func init() {
 		getCatFileCmd(),
 		getWriteTreeCmd(),
 		getUpdateIndexCmd(),
+		getCommitCmd(),
 	}
 
 	for _, subcommand := range subcommands {

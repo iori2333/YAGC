@@ -13,6 +13,14 @@ type UserConfig struct {
 	EMail string `yaml:"e_mail"`
 }
 
+func (u *UserConfig) Valid() bool {
+	return u.Name != "" && u.EMail != ""
+}
+
+func (u *UserConfig) String() string {
+	return u.Name + " <" + u.EMail + ">"
+}
+
 type AppConfig struct {
 	User UserConfig `yaml:"user,omitempty"`
 }

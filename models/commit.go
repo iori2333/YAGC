@@ -40,10 +40,15 @@ func (commit *CommitObject) GetSha1() (string, []byte) {
 }
 
 func (commit *CommitObject) Parse(content []byte) *CommitObject {
-	err := yaml.Unmarshal(content, commit)
-	if err != nil {
+	objType, _, content, err := util.DecodeObject(content)
+	if err != nil || objType != Commit {
 		log.Fatalf("Unable to parse commit object: %v", err)
 	}
+
+	if err := yaml.Unmarshal(content, commit); err != nil {
+		log.Fatalf("Unable to parse commit object: %v", err)
+	}
+
 	return commit
 }
 
