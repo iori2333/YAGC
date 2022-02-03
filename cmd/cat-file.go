@@ -11,8 +11,7 @@ import (
 
 func handleCatFile(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		cmd.Usage()
-		return
+		log.Fatalf("missing argument: object")
 	}
 
 	var object, objType string
@@ -68,20 +67,19 @@ func handleCatFile(cmd *cobra.Command, args []string) {
 	}
 }
 
-func getCatFileCommand() *cobra.Command {
+func getCatFileCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cat-file [type] object",
 		Short: "Provide content or type and size information for repository objects",
-		Long:  `The command provides the content or the type of an object in the repository. The type is required unless -t or -p is used to find the object type, or -s is used to find the object size.`,
-		Run:   handleCatFile,
+		Long: `The command provides the content or the type of an object in the repository. 
+The type is required unless -t or -p is used to find the object type, or -s is used to find the object size.`,
+		Run:    handleCatFile,
+		Hidden: true,
 	}
 
 	cmd.Flags().BoolP("type", "t", false, "Print the type of the object")
-
 	cmd.Flags().BoolP("pretty", "p", false, "Pretty print the object")
-
 	cmd.Flags().BoolP("size", "s", false, "Print the size of the object")
-
 	cmd.Flags().BoolP("error", "e", false, "Test whether an object exists")
 
 	return cmd
