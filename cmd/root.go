@@ -16,7 +16,7 @@ var rootCmd = &cobra.Command{
 		if cmd.Flag("version").Value.String() == "true" {
 			log.Printf("yagc version %s\n", config.Version)
 		} else {
-			cmd.Help()
+			_ = cmd.Help()
 		}
 	},
 }
@@ -32,7 +32,9 @@ func init() {
 	subcommands := []*cobra.Command{
 		getInitCmd(),
 		getHashObjectCmd(),
-		getCatFileCommand(),
+		getCatFileCmd(),
+		getWriteTreeCmd(),
+		getUpdateIndexCmd(),
 	}
 
 	for _, subcommand := range subcommands {
