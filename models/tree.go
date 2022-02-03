@@ -1,63 +1,47 @@
 package models
 
 import (
-	"bytes"
+	"gopkg.in/yaml.v2"
 	"log"
+	"strings"
 	"yagc/util"
 )
 
 // TreeObject is a tree object that contains a list of entries, which
 // are either other trees or blobs
 type TreeObject struct {
-	Id      string  `yaml:"id"`      // Sha1 of tree
 	Entries []Entry `yaml:"entries"` // List of entries
 }
 
-func (object *TreeObject) GetType() ObjectType {
+func (tree *TreeObject) GetType() ObjectType {
 	return Tree
 }
 
-func (object *TreeObject) GetContent() []byte {
-	buf := bytes.Buffer{}
-	for _, entry := range object.Entries {
-		buf.WriteString(entry.String())
+func (tree *TreeObject) GetContent() []byte {
+	out, err := yaml.Marshal(tree)
+	if err != nil {
+		log.Fatalf("Error marshalling tree object: %s", err)
 	}
-	return util.EncodeObject(object.GetType(), buf.Bytes())
+	return util.EncodeObject(tree.GetType(), out)
 }
 
-func (object *TreeObject) GetSha1() (string, []byte) {
-	content := object.GetContent()
-	if object.Id == "" {
-		sha1 := util.GetSha1(content)
-		object.Id = sha1
-	}
-	return object.Id, content
+func (tree *TreeObject) GetSha1() (string, []byte) {
+	content := tree.GetContent()
+	sha1 := util.GetSha1(content)
+
+	return sha1, content
 }
 
-func (object *TreeObject) Parse(content []byte) *TreeObject {
-	entries := make([]Entry, 0)
-	for _, line := range bytes.Split(content, []byte("\n")) {
-		if len(line) == 0 {
-			continue
-		}
-
-		entry := bytes.SplitN(line, []byte(" "), 4)
-		if len(entry) != 4 {
-			log.Fatalf("Failed to parse tree entry: %s\n", entry)
-		}
-		entries = append(entries, Entry{
-			Id:   string(entry[0]),
-			Type: string(entry[1]),
-			Mode: string(entry[2]),
-			File: string(entry[3]),
-		})
+func (tree *TreeObject) Parse(content []byte) *TreeObject {
+	err := yaml.Unmarshal(content, tree)
+	if err != nil {
+		log.Fatalf("Error unmarshalling tree object: %s", err)
 	}
-	object.Entries = entries
-	return object
+	return tree
 }
 
-func (object *TreeObject) Exists(sha1 string) bool {
-	for _, entry := range object.Entries {
+func (tree *TreeObject) Exists(sha1 string) bool {
+	for _, entry := range tree.Entries {
 		if entry.Id == sha1 {
 			return true
 		}
@@ -65,6 +49,14 @@ func (object *TreeObject) Exists(sha1 string) bool {
 	return false
 }
 
-func (object *TreeObject) AddEntry(entry Entry) {
-	object.Entries = append(object.Entries, entry)
+func (tree *TreeObject) AddEntry(entry Entry) {
+	tree.Entries = append(tree.Entries, entry)
+}
+
+func (tree *TreeObject) String() string {
+	builder := strings.Builder{}
+	for _, entry := range tree.Entries {
+		builder.WriteString(entry.String())
+	}
+	return builder.String()
 }

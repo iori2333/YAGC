@@ -1,15 +1,16 @@
 package models
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"log"
+	"strings"
 	"yagc/util"
 )
 
 // CommitObject is a representation of a commit object. It contains the
 // basic information about a commit and its TreeObject.
 type CommitObject struct {
-	Id         string `yaml:"id"`          // Sha1 of the commit
 	Message    string `yaml:"message"`     // Commit message
 	Author     string `yaml:"author"`      // Author of the commit
 	Committer  string `yaml:"committer"`   // Committer of the commit
@@ -33,11 +34,9 @@ func (commit *CommitObject) GetContent() []byte {
 
 func (commit *CommitObject) GetSha1() (string, []byte) {
 	content := commit.GetContent()
-	if commit.Id == "" {
-		sha1 := util.GetSha1(content)
-		commit.Id = sha1
-	}
-	return commit.Id, content
+	sha1 := util.GetSha1(content)
+
+	return sha1, content
 }
 
 func (commit *CommitObject) Parse(content []byte) *CommitObject {
@@ -46,4 +45,19 @@ func (commit *CommitObject) Parse(content []byte) *CommitObject {
 		log.Fatalf("Unable to parse commit object: %v", err)
 	}
 	return commit
+}
+
+func (commit *CommitObject) String() string {
+	builder := strings.Builder{}
+
+	builder.WriteString(fmt.Sprintf("tree %s\n", commit.TreeObject))
+	if commit.Parent != "" {
+		builder.WriteString(fmt.Sprintf("parent %s\n", commit.Parent))
+	}
+	builder.WriteString(fmt.Sprintf("author %s\n", commit.Author))
+	builder.WriteString(fmt.Sprintf("committer %s\n", commit.Committer))
+	builder.WriteString(fmt.Sprintf("date %s\n", commit.Date))
+	builder.WriteString(fmt.Sprintf("\n%s\n", commit.Message))
+
+	return builder.String()
 }

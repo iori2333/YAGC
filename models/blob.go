@@ -7,7 +7,6 @@ import (
 )
 
 type BlobObject struct {
-	Id   string `yaml:"id"`
 	File string `yaml:"file"`
 }
 
@@ -25,9 +24,15 @@ func (blob *BlobObject) GetContent() []byte {
 
 func (blob *BlobObject) GetSha1() (string, []byte) {
 	content := blob.GetContent()
-	if blob.Id == "" {
-		sha1 := util.GetSha1(content)
-		blob.Id = sha1
+	sha1 := util.GetSha1(content)
+
+	return sha1, content
+}
+
+func (blob *BlobObject) String() string {
+	content, err := os.ReadFile(blob.File)
+	if err != nil {
+		log.Fatalf("Failed to read file %s: %s\n", blob.File, err)
 	}
-	return blob.Id, content
+	return string(content)
 }

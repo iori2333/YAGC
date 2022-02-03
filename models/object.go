@@ -12,4 +12,5 @@ type Object interface {
 	GetType() ObjectType
 	GetContent() []byte
 	GetSha1() (string, []byte)
+	String() string // for pretty printing
 }
