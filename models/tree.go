@@ -31,7 +31,7 @@ func (object *TreeObject) GetSha1() (string, []byte) {
 		sha1 := util.GetSha1(content)
 		object.Id = sha1
 	}
-	return object.Id, object.GetContent()
+	return object.Id, content
 }
 
 func (object *TreeObject) Parse(content []byte) *TreeObject {
