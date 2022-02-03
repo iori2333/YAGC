@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"yagc/db"
+	"yagc/models"
 	"yagc/util"
 
 	"github.com/spf13/cobra"
@@ -23,7 +24,7 @@ func handleCatFile(cmd *cobra.Command, args []string) {
 		cmd.Flag("pretty").Changed
 
 	if len(args) == 1 {
-		if !useType && !useSize && !useError {
+		if !useType && !useSize && !usePretty && !useError {
 			log.Fatalln("Type is required")
 		}
 		object = args[0]
@@ -56,9 +57,13 @@ func handleCatFile(cmd *cobra.Command, args []string) {
 		case "blob":
 			log.Println(string(content))
 		case "tree":
-			log.Println(string(content))
+			obj := models.TreeObject{}
+			obj.Parse(content)
+			log.Println(obj.String())
 		case "commit":
-			log.Println(string(content))
+			obj := models.CommitObject{}
+			obj.Parse(content)
+			log.Println(obj.String())
 		}
 	} else if realType == objType {
 		log.Println(string(content))
