@@ -58,7 +58,7 @@ func handleCatFile(cmd *cobra.Command, args []string) {
 			log.Println(string(content))
 		case "tree":
 			obj := models.TreeObject{}
-			obj.Parse(content)
+			obj.ParseNoHeader(content)
 			log.Println(obj.String())
 		case "commit":
 			obj := models.CommitObject{}

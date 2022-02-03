@@ -33,8 +33,16 @@ func (tree *TreeObject) GetSha1() (string, []byte) {
 }
 
 func (tree *TreeObject) Parse(content []byte) *TreeObject {
-	err := yaml.Unmarshal(content, tree)
-	if err != nil {
+	objType, _, content, err := util.DecodeObject(content)
+	if err != nil || objType != Tree {
+		log.Fatalf("Error decoding tree object: %s", err)
+	}
+
+	return tree.ParseNoHeader(content)
+}
+
+func (tree *TreeObject) ParseNoHeader(content []byte) *TreeObject {
+	if err := yaml.Unmarshal(content, tree); err != nil {
 		log.Fatalf("Error unmarshalling tree object: %s", err)
 	}
 	return tree

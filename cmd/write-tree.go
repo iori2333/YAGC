@@ -2,16 +2,15 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"log"
 	"yagc/db"
-	"yagc/models"
 )
 
 func handleWriteTree(*cobra.Command, []string) {
-	index := db.ReadIndex()
-	tree := models.TreeObject{}
-	tree.Parse(index)
+	tree := db.ReadIndex()
 	sha1, content := tree.GetSha1()
 	db.WriteObject(sha1, content)
+	log.Println(sha1)
 }
 
 func getWriteTreeCmd() *cobra.Command {

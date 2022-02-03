@@ -8,7 +8,7 @@ import (
 	"yagc/util"
 )
 
-func WriteIndex(content []byte) {
+func WriteIndex(tree *models.TreeObject) {
 	root, ok := util.GetRepoRoot()
 	if !ok {
 		log.Fatalln("Failed to get repo root")
@@ -27,12 +27,12 @@ func WriteIndex(content []byte) {
 		log.Fatalf("Failed to create file %s: %s\n", indexPath, err)
 	}
 
-	if _, err := file.Write(util.Compress(content)); err != nil {
+	if _, err := file.Write(util.Compress(tree.GetContent())); err != nil {
 		log.Fatalf("Failed to write to file %s: %s\n", indexPath, err)
 	}
 }
 
-func ReadIndex() []byte {
+func ReadIndex() *models.TreeObject {
 	root, ok := util.GetRepoRoot()
 	if !ok {
 		log.Fatalln("Failed to get repo root")
@@ -44,7 +44,9 @@ func ReadIndex() []byte {
 		log.Fatalf("Failed to read file %s: %s\n", indexPath, err)
 	}
 
-	return util.Decompress(content)
+	content = util.Decompress(content)
+	ret := models.TreeObject{}
+	return ret.Parse(content)
 }
 
 func CreateIndex(files []string) {
@@ -54,22 +56,24 @@ func CreateIndex(files []string) {
 	}
 
 	indexPath := path.Join(root, ".yagc", "index")
-	tree := models.TreeObject{}
+	tree := &models.TreeObject{}
 
 	if _, err := os.Stat(indexPath); os.IsNotExist(err) {
 		if _, err := os.Create(indexPath); err != nil {
 			log.Fatalf("Failed to create index file %s: %s\n", indexPath, err)
 		}
 	} else {
-		index := ReadIndex()
-		tree.Parse(index)
+		tree = ReadIndex()
 	}
 
 	for _, file := range files {
-		addTree(&tree, file)
+		if file == ".yagc" {
+			continue
+		}
+		addTree(tree, file)
 	}
 
-	WriteIndex(tree.GetContent())
+	WriteIndex(tree)
 }
 
 func addTree(currTree *models.TreeObject, name string) {
