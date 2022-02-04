@@ -41,6 +41,10 @@ func Commit(message string) {
 	}
 
 	index := ReadIndex()
+	if index.IsEmpty() {
+		log.Println("Empty index, nothing to commit")
+		return
+	}
 
 	sha1, content := index.GetSha1()
 	WriteObject(sha1, content)
@@ -76,4 +80,15 @@ func LastCommit() string {
 	}
 
 	return string(curr)
+}
+
+func LastCommitTree() *models.TreeObject {
+	sha1 := LastCommit()
+	content := FindObject(sha1)
+	commit := models.CommitObject{}
+	commit.Parse(content)
+
+	treeContent := FindObject(commit.TreeObject)
+	tree := models.TreeObject{}
+	return tree.Parse(treeContent)
 }
